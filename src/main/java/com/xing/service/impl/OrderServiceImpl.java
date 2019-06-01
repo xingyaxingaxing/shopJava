@@ -43,6 +43,7 @@ public class OrderServiceImpl implements OrderService {
     private WebSocket webSocket;
     @Override
     public OrderDTO create(OrderDTO orderDTO) {
+        //KeyUtil.genUniqueKey()生成唯一的随机数
         String orderId=KeyUtil.genUniqueKey();
         BigDecimal orderAmount=new BigDecimal(BigInteger.ZERO);
 
@@ -53,7 +54,6 @@ public class OrderServiceImpl implements OrderService {
             if(productInfo==null){
                 throw new SellException(ResultEnum.PRODUCT_NOT_EXIST);
             }
-
             //2计算订单总价(必须用特有的方法)
             orderAmount=productInfo.getProductPrice().
                     multiply(new BigDecimal(oderDetail.getProductQuantity()))
@@ -71,32 +71,24 @@ public class OrderServiceImpl implements OrderService {
            ////carDTOList.add(carDTO);
 
         }
-
-
-
         //3写入订单数据库
         OrderMaster orderMaster=new OrderMaster();
         orderDTO.setOderId(orderId);
         BeanUtils.copyProperties(orderDTO,orderMaster);
         orderMaster.setOderAmount(orderAmount);
         orderMaster.setOderStatus(OrderStatusEnum.NEW.getCode());
-        orderMaster.setPayStatus(PayStatusEnum.WAIT.getCode());
-
-        //
+        //状态
+        //orderMaster.setPayStatus(PayStatusEnum.WAIT.getCode());
         orderMaster.setCreateTime(new Date());
         orderMaster.setUpdateTime(new Date());
-        //
         orderMasterRepository.save(orderMaster);
-
         //4扣库存
         List<CarDTO> carDTOList=orderDTO.getOderDetailList().stream().map(e->
                 new CarDTO(e.getProductId(),e.getProductQuantity()))
                 .collect(Collectors.toList());
         productService.decreaseStock(carDTOList);
-
         //发送webSocket消息
         webSocket.sendMessage(orderDTO.getOderId());
-
         return orderDTO;
     }
 
@@ -117,7 +109,14 @@ public class OrderServiceImpl implements OrderService {
         orderDTO.setOderDetailList(oderDetailList);
         return orderDTO;
     }
-//事务管理对于企业应用来说是至关重要的，即使出现异常情况，它也可以保证数据的一致性。
+
+    @Override
+    public OrderMaster AfindOne(String orderId) {
+        OrderMaster orderMaster=orderMasterRepository.findOne(orderId);
+        return orderMaster;
+    }
+
+    //事务管理对于企业应用来说是至关重要的，即使出现异常情况，它也可以保证数据的一致性。
     @Override
     @Transactional
     public Page<OrderDTO> findList(String buyerOpenid, Pageable pageable) {
@@ -213,5 +212,10 @@ public class OrderServiceImpl implements OrderService {
         List<OrderDTO>orderDTOList=OrderMaster2OrderDTOConverter.convert(orderMasterPage.getContent());
         return new PageImpl<>(orderDTOList,pageable,orderMasterPage.getTotalElements());
 
+    }
+
+    @Override
+    public OrderMaster save(OrderMaster orderMaster) {
+        return orderMasterRepository.save(orderMaster);
     }
 }

@@ -6,6 +6,17 @@ public class OrderForm {
     @NotEmpty(message = "姓名必填")
     private String name;
 
+    @NotEmpty(message = "支付未完成")
+    private String payStatus;
+
+    public String getPayStatus() {
+        return payStatus;
+    }
+
+    public void setPayStatus(String payStatus) {
+        this.payStatus = payStatus;
+    }
+
     public String getName() {
         return name;
     }
@@ -66,29 +77,7 @@ public class OrderForm {
                 ", address='" + address + '\'' +
                 ", openid='" + openid + '\'' +
                 ", items='" + items + '\'' +
+                ", payStatus='" + payStatus + '\'' +
                 '}';
     }
-/*
-    @NotEmpty(message = "创建时间不能为空")
-    private String createTime;
-
-    @NotEmpty(message = "更新时间不能为空")
-    private String updateTime;
-
-    public String getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(String createTime) {
-        this.createTime = createTime;
-    }
-
-    public String getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(String updateTime) {
-        this.updateTime = updateTime;
-    }
-    */
 }

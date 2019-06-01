@@ -1,6 +1,7 @@
 package com.xing.dto;
 
 /*购物车
+*数据传输对象，在各个层里传输用
 * */
 public class CarDTO {
     /*商品ID*/

@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 
 public class OrderForm2OrderDTOConverter {
+
     public static OrderDTO convert(OrderForm orderForm){
         Gson gson=new Gson();
         OrderDTO orderDTO=new OrderDTO();
@@ -21,6 +22,7 @@ public class OrderForm2OrderDTOConverter {
         orderDTO.setBuyerPhone(orderForm.getPhone());
         orderDTO.setBuyerAddress(orderForm.getAddress());
         orderDTO.setBuyerOpenid(orderForm.getOpenid());
+        orderDTO.setPayStatus(Integer.parseInt(orderForm.getPayStatus()));
         orderDTO.setCreateTime(new Date());
         orderDTO.setUpdateTime(new Date());
 
@@ -28,7 +30,6 @@ public class OrderForm2OrderDTOConverter {
     try {
         oderDetailList=gson.fromJson(orderForm.getItems(),
                 new TypeToken<List<OderDetail>>() {
-
                 }.getType());
     } catch (Exception e){
             throw new SellException(ResultEnum.PARAM_ERROR);
